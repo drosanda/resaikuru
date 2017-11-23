@@ -1,0 +1,9 @@
+[
+  "<script src=\"{{base_url}}assets/js/jquery-3.2.1.min.js\"><\/script>",
+  "<script src=\"{{base_url}}skin/front/js/bootstrap.min.js\"><\/script>",
+  "<script src=\"{{base_url}}assets/js/jquery-ui.min.js\"><\/script>",
+  "<script src=\"{{base_url}}skin/front/js/owl.carousel.min.js\"><\/script>",
+  "<script src=\"{{base_url}}skin/front/js/jtv-mobile-menu.js\"><\/script>",
+  "<script src=\"{{base_url}}skin/front/js/countdown.js\"><\/script>",
+  "<script src=\"{{base_url}}skin/front/js/main.js\"><\/script>"
+]
