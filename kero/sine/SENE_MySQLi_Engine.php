@@ -28,10 +28,16 @@ class SENE_MySQLi_Engine{
 	function __construct(){
 		$db = $GLOBALS['db'];
     $port = ini_get('mysqli.default_port');
-
+		mysqli_report(MYSQLI_REPORT_STRICT);
     //$this->koneksi=mysqli_connect($db['host'],$db['user'],$db['pass'],$db['name']);
 
-    $this->__mysqli = new mysqli($db['host'],$db['user'],$db['pass'],$db['name'],$port);
+    $this->__mysqli = new mysqli();
+		try {
+			$this->__mysqli->connect($db['host'],$db['user'],$db['pass'],$db['name'],$port);
+		}catch(Exception $e){
+			trigger_error('Tidak dapat tersambung ke database.');
+			die();
+		}
     if ($this->__mysqli->connect_errno) {
       die('Couldn\'t connect to database. Please, check your database configuration on '.SENECFG.'/database.php');
     }
@@ -58,17 +64,20 @@ class SENE_MySQLi_Engine{
     return self::$_instance;
   }
   public function autocommit($var=1){
-    $this->__mysqli->autocommit($var);
+    return $this->__mysqli->autocommit($var);
   }
-  public function begin($var=1){
-    $this->__mysqli->begin_transaction($var);
+  public function begin(){
+    return $this->__mysqli->begin_transaction();
   }
   public function commit(){
-    $this->__mysqli->commit();
+    return $this->__mysqli->commit();
   }
   public function rollback(){
-    $this->__mysqli->rollback();
+    return $this->__mysqli->rollback();
   }
+	public function savepoint($sp){
+		return $this->__mysqli->savepoint($sp);
+	}
 	public function debug($sql=""){
 		$this->fieldname[] = 'error';
 		$this->fieldname[] = 'code';
@@ -82,7 +91,8 @@ class SENE_MySQLi_Engine{
 		if($res){
 			return 1;
 		}else{
-			$this->debug($sql);
+			//$this->debug($sql);
+			trigger_error('Error: '.$this->__mysqli->error.' -- SQL: '.$sql);
 			return 0;
 		}
 	}
@@ -171,6 +181,7 @@ class SENE_MySQLi_Engine{
 					return $dataz;
 				}else{
 					$this->debug($sql);
+					trigger_error('Error: '.$this->__mysqli->error.' -- SQL: '.$sql);
 					return $this->fieldvalue;
 				}
 			}
@@ -197,6 +208,7 @@ class SENE_MySQLi_Engine{
 				return $dataz;
 			}else{
 				$this->debug($sql);
+				trigger_error('Error: '.$this->__mysqli->error.' -- SQL: '.$sql);
 				return $this->fieldvalue;
 			}
 		}
@@ -253,7 +265,7 @@ class SENE_MySQLi_Engine{
 
 	}
 	public function __destruct(){
-		$this->__mysqli->close();
+		if(is_resource($this->__mysqli)) $this->__mysqli->close();
 	}
 	public function getField(){
 		return array("field"=>$this->fieldname,"value"=>fieldvalue);
@@ -537,85 +549,85 @@ class SENE_MySQLi_Engine{
 				switch($comp){
 					case "like":
 						$c= "LIKE";
-						$val = $this->esc($val);
+						$val = ($val);
 						break;
 					case 'like%':
 						$c= "LIKE";
-						$val = ''.$v.'%';
-						$val = $this->esc($val);
+						$val = '\''.$v.'%\'';
+						$val = ($val);
 						break;
 					case '%like':
 						$c= "LIKE";
-						$val = '%'.$v.'';
-						$val = $this->esc($val);
+						$val = '\'%'.$v.'\'';
+						$val = ($val);
 						break;
 					case 'like%%':
 						$c= "LIKE";
-						$val = '%'.$v.'%';
-						$val = $this->esc($val);
+						$val = '\'%'.$v.'%\'';
+						$val = ($val);
 						break;
 					case '%like%':
 						$c= "LIKE";
-						$val = '%'.$v.'%';
-						$val = $this->esc($val);
+						$val = '\'%'.$v.'%\'';
+						$val = ($val);
 						break;
 					case "notlike":
 						$c= "NOT LIKE";
-						$val = $this->esc($val);
+						$val = ($val);
 						break;
 					case "notlike%%":
 						$c= "NOT LIKE";
-						$val = '%'.$v.'%';
-						$val = $this->esc($val);
+						$val = '\'%'.$v.'%\'';
+						$val = ($val);
 						break;
 					case "%notlike%":
 						$c= "NOT LIKE";
-						$val = '%'.$v.'%';
-						$val = $this->esc($val);
+						$val = '\'%'.$v.'%\'';
+						$val = ($val);
 						break;
 					case "notlike%":
 						$c= "NOT LIKE";
-						$val = "".$v.'%';
-						$val = $this->esc($val);
+						$val = '\''.$v.'%\'';
+						$val = ($val);
 						break;
 					case "%notlike":
 						$c= "NOT LIKE";
-						$val = '%'.$v."";
-						$val = $this->esc($val);
+						$val = '\'%'.$v.'\'';
+						$val = ($val);
 						break;
 					case "!=":
 						$c= "<>";
 						$val = "".$v."";
-						$val = $this->esc($val);
+						$val = ($val);
 						break;
 					case "<>":
 						$c= "<>";
 						$val = "".$v."";
-						$val = $this->esc($val);
+						$val = ($val);
 						break;
 					case ">=":
 						$c= ">=";
 						$val = "".$v."";
-						$val = $this->esc($val);
+						$val = ($val);
 						break;
 					case "<=":
 						$c= "<=";
 						$val = "".$v."";
-						$val = $this->esc($val);
+						$val = ($val);
 						break;
 					case ">":
 						$c= ">";
 						$val = "".$v."";
-						$val = $this->esc($val);
+						$val = ($val);
 						break;
 					case "<":
 						$c= "<";
 						$val = "".$v."";
-						$val = $this->esc($val);
+						$val = ($val);
 						break;
 					default:
 						$c = "=";
-						$val = $this->esc($v);
+						$val = ($v);
 				}
 
 				if($bracket){
@@ -666,63 +678,83 @@ class SENE_MySQLi_Engine{
 			switch($comp){
 				case "like":
 					$c = "LIKE";
-					$val = $this->esc($val);
+					$val = ($val);
 					break;
 				case 'like%':
 					$c= "LIKE";
-					$val = "".$v.'%';
+					$val = "\'".$v.'%\'';
 					//die($val);
-					$val = $this->esc($val);
+					$val = ($val);
 					//die($val);
 					break;
 				case '%like':
 					$c= "LIKE";
-					$val = '%'.$v."";
-					$val = $this->esc($val);
+					$val = '\'%'.$v.'\'';
+					$val = ($val);
 					break;
 				case 'like%%':
 					$c= "LIKE";
-					$val = '%'.$v.'%';
-					$val = $this->esc($val);
+					$val = '\'%'.$v.'%\'';
+					$val = ($val);
 					break;
 				case "%like%":
 					$c= "LIKE";
-					$val = '%'.$v.'%';
-					$val = $this->esc($val);
+					$val = '\'%'.$v.'%\'';
+					$val = ($val);
 					break;
 				case "notlike":
 					$c= "NOT LIKE";
-					$val = $this->esc($val);
+					$val = ($val);
 					break;
 				case "notlike%%":
 					$c= "NOT LIKE";
-					$val = '%'.$v.'%';
-					$val = $this->esc($val);
+					$val = '\'%'.$v.'%\'';
+					$val = ($val);
 					break;
 				case "%notlike%":
 					$c= "NOT LIKE";
-					$val = '%'.$v.'%';
-					$val = $this->esc($val);
+					$val = '\'%'.$v.'%\'';
+					$val = ($val);
 					break;
 				case "notlike%":
 					$c= "NOT LIKE";
-					$val = "".$v.'%';
-					$val = $this->esc($val);
+					$val = '\''.$v.'%\'';
+					$val = ($val);
 					break;
 				case "%notlike":
 					$c= "NOT LIKE";
-					$val = '%'.$v."";
-					$val = $this->esc($val);
+					$val = '\'%'.$v.'\'';
+					$val = ($val);
 					break;
 				case "!=":
 					$c= "<>";
 					$val = "".$v."";
-					$val = $this->esc($val);
+					$val = ($val);
 					break;
 				case "<>":
 					$c= "<>";
 					$val = "".$v."";
-					$val = $this->esc($val);
+					$val = ($val);
+					break;
+				case ">":
+					$c= ">";
+					$val = "".$v."";
+					$val = ($val);
+					break;
+				case ">=":
+					$c= ">=";
+					$val = "".$v."";
+					$val = ($val);
+					break;
+				case "<":
+					$c= "<";
+					$val = "".$v."";
+					$val = ($val);
+					break;
+				case "<=":
+					$c= "<=";
+					$val = "".$v."";
+					$val = ($val);
 					break;
 				default:
 					if($v=="IS NULL" || $v=="is null"){
@@ -731,7 +763,7 @@ class SENE_MySQLi_Engine{
 						$val = $v;
 					}else{
 						$c = "=";
-						$val = $this->esc($v);
+						$val = $v;
 					}
 			}
 			$this->in_where .= " ".$c." ".$val." ";
@@ -805,6 +837,7 @@ class SENE_MySQLi_Engine{
 		$this->pagesize = 0;
 		$this->limit_a = 0;
 		$this->limit_b = 0;
+		return $this;
 	}
 	public function limit($a,$b=""){
 		$this->is_limit=1;
@@ -814,6 +847,7 @@ class SENE_MySQLi_Engine{
 		}
 		$this->limit_a=$a;
 		$this->limit_b=$b;
+		return $this;
 	}
 	public function page($page,$page_size=""){
 		if(!empty($page_size) && empty($page)){
@@ -863,6 +897,11 @@ class SENE_MySQLi_Engine{
 				die();
 			}
 
+		}else{
+			$table_alias = array_search($this->table,$this->as_from);
+			if($table_alias !== 0 ){
+				$sql .= " ".$table_alias." ";
+			}
 		}
 
 		if(!empty($this->in_where)){
@@ -919,16 +958,12 @@ class SENE_MySQLi_Engine{
 		$sql = "SELECT ".$this->in_select." FROM `".$this->table."`";
 
 
-		$table_alias = array_search($this->table,$this->as_from);
-		if($table_alias !== 0){
-			$sql .= " ".$table_alias." ";
-		}
-
 		if(count($this->join) > 0){
 			//print_r($this->as_from);
 			//die();
 			$table_alias = array_search($this->table,$this->as_from);
 			if($table_alias !== 0 ){
+				$sql .= " ".$table_alias." ";
 				foreach($this->join as $j){
 					$sql .= strtoupper($j->method)." JOIN ";
 					$table_on = $j->table_on;
@@ -942,12 +977,21 @@ class SENE_MySQLi_Engine{
 				die();
 			}
 
+		}else{
+			$table_alias = array_search($this->table,$this->as_from);
+			if($table_alias !== 0 ){
+				$sql .= " ".$table_alias." ";
+			}
 		}
 
 		if(!empty($this->in_where)){
 			$this->in_where = rtrim($this->in_where,"AND ");
 			$sql .= " WHERE ".$this->in_where;
 		}
+    $sql = rtrim($sql,' ');
+    $sql = rtrim($sql,' AND');
+    $sql = rtrim($sql,' OR');
+    $sql = $sql.' ';
 
 
 		if(!empty($this->in_group)){
@@ -994,6 +1038,15 @@ class SENE_MySQLi_Engine{
 		$this->join = array();
 		$this->in_join = 0;
 		return $this;
+	}
+	public function query_multi($sql){
+		$this->__mysqli->multi_query($sql);
+		if($this->__mysqli->errno){
+			trigger_error($this->__mysqli->error);
+		}
+	}
+	public function insert_batch($table,$datas,$is_debug=0){
+		$this->insert_multi($table,$datas=array(),$is_debug=0);
 	}
 	public function insert_multi($table,$datas=array(),$is_debug=0){
 		//$multi_array=0;
@@ -1200,7 +1253,7 @@ class SENE_MySQLi_Engine{
 		$this->in_where .= "(";
 		$this->in_where .= " ".$key."";
 		if($is_not) $this->in_where .= " NOT ";
-		$this->in_where .= "BETWEEN ".$val1." AND ".$val2."";
+		$this->in_where .= " BETWEEN ".$val1." AND ".$val2."";
 		$this->in_where .= ") AND ";
 		return $this;
 	}

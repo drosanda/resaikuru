@@ -1,8 +1,8 @@
 <?php
 	Class JI_Controller extends SENE_Controller {
-		var $site_title = 'Hakuna Taka | Everything is Useful';
-		var $site_description = 'Hakuna Taka | Everything is Useful';
-		var $site_suffix = ' | Hakuna Taka';
+		var $site_title = 'Risaikuru | Everything is Useful';
+		var $site_description = 'Risaikuru | Everything is Useful';
+		var $site_suffix = ' | Risaikuru';
 		var $site_keyword = 'Everything is Useful';
 		var $page_current = 'beranda';
 		var $menu_current = 'beranda';

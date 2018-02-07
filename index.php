@@ -2,7 +2,7 @@
 session_start();
 ini_set("error_reporting",E_ALL);
 $website_view_id = 1; // default
-$admin_secret_url = 'admin';
+$admin_secret_url = 'adminMaster';
 
 $apps_dir='app';
 $assets_dir='assets';
@@ -155,8 +155,6 @@ if(!isset($admin_url)){
 }
 define("ADMIN_URL",$admin_url);
 define("WEBSITE_VIEW_ID",$website_view_id);
-
-$routing = array();
 
 
 require_once SENEKEROSINE."/SENE_Engine.php";

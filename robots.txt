@@ -1,5 +1,5 @@
 User-Agent: *
-Disallow: 
+Disallow:
 Disallow: /app
 Disallow: /kero
 Allow: /assets/
@@ -8,5 +8,3 @@ Allow: /assets/img/
 Allow: /media
 Allow: /media/produk
 Allow: /skin
-
-Sitemap: https://jangiman.com/sitemap.xml
